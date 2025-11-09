@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:innohproject/src/helpers/snackbars.dart';
 
 class ClientLog extends StatelessWidget {
   const ClientLog({super.key});
@@ -34,7 +35,10 @@ class ClientLog extends StatelessWidget {
                 backgroundColor: Colors.blueAccent,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              child: const Text('Ingresar', style: TextStyle(fontSize: 18)),
+              child: const Text(
+                'Ingresar',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
             ),
           ),
           const SizedBox(height: 16),

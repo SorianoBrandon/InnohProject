@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:innohproject/src/widgets/clientlog.dart';
-import 'package:innohproject/src/widgets/GradientController.dart';
 import 'package:innohproject/src/widgets/logmessage.dart';
+import 'package:flutter/material.dart';
+import 'package:innohproject/src/widgets/GradientController.dart';
+import 'package:innohproject/src/atom/switchlogcontroller.dart';
+import 'package:innohproject/src/widgets/clientlog.dart';
+import 'package:innohproject/src/widgets/employlog.dart';
 import 'package:get/get.dart';
 
 class HomeView extends StatelessWidget {
@@ -11,6 +13,7 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     final sizescreen = MediaQuery.of(context).size;
     final GradienteController controller = Get.put(GradienteController());
+    final loginController = Get.put(LoginSwitchController());
     final esPantallaGrande = sizescreen.width > 800;
     return Scaffold(
       body: SingleChildScrollView(
@@ -58,7 +61,7 @@ class HomeView extends StatelessWidget {
                                       offset: const Offset(0, -30),
                                       child: TextButton(
                                         onPressed: () {
-                                          // Navegar a login de empleados
+                                          loginController.toggleLog();
                                         },
                                         style: TextButton.styleFrom(
                                           foregroundColor: Colors.white,
@@ -80,7 +83,11 @@ class HomeView extends StatelessWidget {
                                   children: [
                                     Expanded(child: LogMessage()),
                                     const SizedBox(width: 32),
-                                    Expanded(child: ClientLog()),
+                                    Expanded(
+                                      child: loginController.isEmpleado.value
+                                          ? EmployLog()
+                                          : ClientLog(),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -89,7 +96,9 @@ class HomeView extends StatelessWidget {
                               children: [
                                 LogMessage(),
                                 const SizedBox(height: 32),
-                                ClientLog(),
+                                loginController.isEmpleado.value
+                                    ? EmployLog()
+                                    : ClientLog(),
                               ],
                             ),
                     ),
