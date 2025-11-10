@@ -161,3 +161,84 @@ class CriticalErrorSnackbar {
     );
   }
 }
+
+class ConfirmActionDialog {
+  static Future<void> show({
+    required BuildContext context,
+    required String message,
+    required VoidCallback onConfirm,
+    required VoidCallback onDenied,
+  }) async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false, // Evita que se cierre tocando fuera
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 10,
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.help_outline_rounded,
+                  size: 50,
+                  color: Colors.orange,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Cierra el modal
+                        onConfirm(); // Ejecuta la acción
+                      },
+                      icon: const Icon(Icons.check_circle_outline),
+                      label: const Text('Sí'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        onDenied();
+                        Navigator.of(context).pop();
+                      }, // Solo cierra
+                      icon: const Icon(Icons.cancel_outlined),
+                      label: const Text('No'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

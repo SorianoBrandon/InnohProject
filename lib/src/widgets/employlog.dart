@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:innohproject/src/atom/textfieldscontroller.dart';
 import 'package:innohproject/src/helpers/snackbars.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:innohproject/src/auth/login_auth.dart';
 
 class EmployLog extends StatelessWidget {
   const EmployLog({super.key});
@@ -43,54 +43,46 @@ class EmployLog extends StatelessWidget {
             obscureText: true,
           ),
           const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () async {
-                final user = employCtrl.cont_User.text.trim();
-                final password = employCtrl.cont_Password.text.trim();
+          Obx(
+            () => SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: employCtrl.isLoading.value
+                    ? null
+                    : () async {
+                        final user = employCtrl.cont_User.text.trim();
+                        final password = employCtrl.cont_Password.text.trim();
 
-                if (user.isEmpty || password.isEmpty) {
-                  WarningSnackbar.show(
-                    context,
-                    'Por favor completar todos los campos.',
-                  );
-                  return;
-                }
+                        if (user.isEmpty || password.isEmpty) {
+                          WarningSnackbar.show(
+                            context,
+                            'Por favor completar todos los campos.',
+                          );
+                          return;
+                        }
 
-                try {
-                  final snapshot = await FirebaseFirestore.instance
-                      .collection('Empleados')
-                      .where('User', isEqualTo: user)
-                      .limit(1)
-                      .get();
+                        employCtrl.isLoading.value = true;
 
-                  if (snapshot.docs.isEmpty) {
-                    WarningSnackbar.show(context, 'Usuario no encontrado.');
-                    return;
-                  }
+                        final log = await LoginAuth().Loging(
+                          context,
+                          user,
+                          password,
+                        );
 
-                  final data = snapshot.docs.first.data();
-                  if (data['Password'] == password) {
-                    context.go('/manager');
-                  } else {
-                    ErrorSnackbar.show(context, 'Contraseña incorrecta.');
-                  }
-                } catch (e) {
-                  CriticalErrorSnackbar.show(
-                    context,
-                    'Error al conectar con el servidor.',
-                  );
-                  print('Login error: $e');
-                }
-              }, // vacío por ahora
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-              child: const Text(
-                'Ingresar',
-                style: TextStyle(fontSize: 18, color: Colors.white),
+                        employCtrl.isLoading.value = false;
+
+                        if (log != 0) {
+                          context.go('/manager');
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: const Text(
+                  'Ingresar',
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
               ),
             ),
           ),
