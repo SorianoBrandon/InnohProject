@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:innohproject/src/env/env_Colors.dart';
 
 class ErrorSnackbar {
   static void show(BuildContext context, String message) {
@@ -171,72 +172,108 @@ class ConfirmActionDialog {
   }) async {
     await showDialog(
       context: context,
-      barrierDismissible: false, // Evita que se cierre tocando fuera
+      barrierDismissible: false,
       builder: (BuildContext context) {
-        return Dialog(
+        return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
-          elevation: 10,
+          elevation: 8,
           backgroundColor: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.help_outline_rounded,
-                  size: 50,
-                  color: Colors.orange,
-                ),
-                const SizedBox(height: 16),
+          titlePadding: EdgeInsets.zero,
+          title: Container(
+            decoration: BoxDecoration(
+              color: EnvColors.azulito,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: const [
+                Icon(Icons.help_outline_rounded, color: Colors.white, size: 28),
+                SizedBox(width: 10),
                 Text(
-                  message,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
+                  "Confirmar acción",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.of(context).pop(); // Cierra el modal
-                        onConfirm(); // Ejecuta la acción
-                      },
-                      icon: const Icon(Icons.check_circle_outline),
-                      label: const Text('Sí'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                      ),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        onDenied();
-                        Navigator.of(context).pop();
-                      }, // Solo cierra
-                      icon: const Icon(Icons.cancel_outlined),
-                      label: const Text('No'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
           ),
+          content: Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+          ),
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                onConfirm();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: EnvColors.verdete,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 22,
+                  vertical: 12,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(
+                    Icons.check_circle_outline,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    "Sí",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                onDenied();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 22,
+                  vertical: 12,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(Icons.cancel_outlined, color: Colors.white, size: 24),
+                  SizedBox(width: 4),
+                  Text(
+                    "No",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+          ],
         );
       },
     );

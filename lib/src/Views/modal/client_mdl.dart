@@ -59,7 +59,7 @@ class ClientMdl extends StatelessWidget {
                               ConfirmActionDialog.show(
                                 context: context,
                                 message:
-                                    "Cliente no encontrado. ¿Desea agregarlo",
+                                    "Cliente no encontrado. ¿Desea agregarlo?",
                                 onConfirm: () {
                                   controller.isSearching.value = true;
                                 },

@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+import 'package:innohproject/src/Views/modal/brand_mdl.dart';
 import 'package:innohproject/src/Views/modal/client_mdl.dart';
+import 'package:innohproject/src/Views/modal/employee_mdl.dart';
+import 'package:innohproject/src/Views/modal/type_mdl.dart';
+import 'package:innohproject/src/atom/brandcontroller.dart';
 import 'package:innohproject/src/atom/clientcontroller.dart';
+import 'package:innohproject/src/atom/employcontroller.dart';
+import 'package:innohproject/src/atom/typecontroller.dart';
 import 'package:innohproject/src/env/current_log.dart';
 import 'package:innohproject/src/env/env_Colors.dart';
 import 'package:innohproject/src/widgets/draweritem.dart';
@@ -167,7 +173,51 @@ class StartView extends StatelessWidget {
               icon: Icons.work_outline_rounded,
               title: "Empleados",
               color: EnvColors.azulito,
-              onTap: () {},
+              onTap: () {
+                context.pop();
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (context) {
+                    Get.put(
+                      Employcontroller(),
+                    ); //y pos con esto llamamos al crud
+                    return EmployeeMdl();
+                  },
+                ).then((_) => Get.delete<Employcontroller>());
+              },
+            ),
+            DrawerItem(
+              icon: Icons.app_registration_rounded,
+              title: "Marcas",
+              color: EnvColors.verdete,
+              onTap: () {
+                context.pop();
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (context) {
+                    Get.put(BrandController());
+                    return BrandMdl();
+                  },
+                ).then((_) => Get.delete<BrandController>());
+              },
+            ),
+            DrawerItem(
+              icon: Icons.category_outlined,
+              title: "Tipos de Productos",
+              color: EnvColors.azulote,
+              onTap: () {
+                context.pop();
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (context) {
+                    Get.put(TypeController());
+                    return TypeMdl();
+                  },
+                ).then((_) => Get.delete<TypeController>());
+              },
             ),
           ],
         ),
