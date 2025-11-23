@@ -43,8 +43,9 @@ class GraficasdMdl extends StatelessWidget {
                       return FutureBuilder<List<BarChartGroupData>>(
                         future: GrfMarcasController().generarDatosBarra(),
                         builder: (context, snapshot) {
-                          if (!snapshot.hasData)
+                          if (!snapshot.hasData) {
                             return const CircularProgressIndicator();
+                          }
                           return GrfBars(
                             datos: snapshot.data!,
                             emitidoPor: CurrentLog.employ!.user,
@@ -58,8 +59,9 @@ class GraficasdMdl extends StatelessWidget {
                         future: GrfMproductoscontroller()
                             .generarDatosBarraPorTipo('Sony'),
                         builder: (context, snapshot) {
-                          if (!snapshot.hasData)
+                          if (!snapshot.hasData) {
                             return const CircularProgressIndicator();
+                          }
                           return GrfBars(
                             datos: snapshot.data!,
                             emitidoPor: CurrentLog.employ!.user,
@@ -75,8 +77,9 @@ class GraficasdMdl extends StatelessWidget {
                           'Consola',
                         ),
                         builder: (context, snapshot) {
-                          if (!snapshot.hasData)
+                          if (!snapshot.hasData) {
                             return const CircularProgressIndicator();
+                          }
                           return GrfBars(
                             datos: snapshot.data!,
                             emitidoPor: CurrentLog.employ!.user,

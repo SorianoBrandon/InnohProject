@@ -18,9 +18,10 @@ class GrfBars extends StatelessWidget {
     this.titulo = 'Garantías por Marca',
   });
 
+  //ESTOY SEGURO QUE NO TOQUE NADA PERO REVISA IGUAL
   @override
   Widget build(BuildContext context) {
-    final fecha = DateFormat('dd/MM/yyyy – hh:mm a').format(DateTime.now());
+    final fecha = DateFormat('dd/MM/yyyy - hh:mm a').format(DateTime.now());
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -30,24 +31,33 @@ class GrfBars extends StatelessWidget {
           // Logo y encabezado
           Row(
             children: [
-              Image.asset('assets/Logo.jpg', height: 90, fit: BoxFit.contain),
+              Flexible(
+                flex: 0,
+                child: Image.asset(
+                  'assets/Logo.jpg',
+                  height: 90,
+                  fit: BoxFit.contain,
+                ),
+              ),
               const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    titulo,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      titulo,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitulo,
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitulo,
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -57,65 +67,75 @@ class GrfBars extends StatelessWidget {
           // Gráfico de barras
           SizedBox(
             height: 320,
-            child: BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceAround,
-                barTouchData: BarTouchData(
-                  enabled: true,
-                  touchTooltipData: BarTouchTooltipData(
-                    // Esta propiedad SÍ existe
-                    tooltipPadding: const EdgeInsets.all(8),
-                    tooltipMargin: 8,
-                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      final porcentaje = rod.toY.toStringAsFixed(0);
-                      final marca = marcas[group.x.toInt()];
-                      return BarTooltipItem(
-                        '$porcentaje%',
-                        const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      getTitlesWidget: (value, meta) => Text(
-                        value.toInt().toString(),
-                        style: const TextStyle(fontSize: 12),
-                      ),
+            child: datos.isEmpty
+                ? const Center(
+                    child: Text(
+                      "Sin datos para mostrar",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        final index = value.toInt();
-                        if (index < marcas.length) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Text(
-                              marcas[index],
+                  )
+                : BarChart(
+                    BarChartData(
+                      alignment: BarChartAlignment.spaceAround,
+                      barTouchData: BarTouchData(
+                        enabled: true,
+                        touchTooltipData: BarTouchTooltipData(
+                          tooltipPadding: const EdgeInsets.all(8),
+                          tooltipMargin: 8,
+                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                            final porcentaje = rod.toY.isFinite
+                                ? rod.toY.toStringAsFixed(0)
+                                : "0";
+                            group.x < marcas.length
+                                ? marcas[group.x.toInt()]
+                                : "";
+                            return BarTooltipItem(
+                              '$porcentaje%',
+                              const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      titlesData: FlTitlesData(
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            interval: 10,
+                            reservedSize: 40,
+                            getTitlesWidget: (value, meta) => Text(
+                              value.toInt().toString(),
                               style: const TextStyle(fontSize: 12),
                             ),
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      },
+                          ),
+                        ),
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            getTitlesWidget: (value, meta) {
+                              final index = value.toInt();
+                              if (index < marcas.length) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Text(
+                                    marcas[index],
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            },
+                          ),
+                        ),
+                      ),
+                      gridData: FlGridData(show: true, drawVerticalLine: true),
+                      borderData: FlBorderData(show: false),
+                      barGroups: datos,
                     ),
                   ),
-                ),
-                gridData: FlGridData(show: true, drawVerticalLine: true),
-                borderData: FlBorderData(show: false),
-                barGroups: datos,
-              ),
-            ),
           ),
 
           const SizedBox(height: 32),

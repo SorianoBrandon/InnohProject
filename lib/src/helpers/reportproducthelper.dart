@@ -2,6 +2,9 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
+//Sale modificado pero como no subo al git nunca se me quita lo modificado al guardar xd
+//asi que supongo que esta igual que el dia de la defensa,no deberia haber cambio alguno
+
 Future<List<Map<String, dynamic>>> ListadoProductosEnProceso({
   int inventDaysMax = 30,
   int seed = 42,
@@ -97,7 +100,7 @@ Future<List<Map<String, dynamic>>> ListadoProductosEnProceso({
     }
 
     final fechaIngresoStr = formatter.format(fechaIngreso);
-    final diasTranscurridos = ahora.difference(fechaIngreso).inDays;
+    final diasTranscurridos = ahora.difference(fechaIngreso).inDays.abs;
 
     // Estado: manejar nulos y mapear a texto
     final estadoRaw = data['Estado'];

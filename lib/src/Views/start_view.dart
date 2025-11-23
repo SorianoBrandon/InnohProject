@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:innohproject/src/custom/custom_drawer.dart';
 import 'package:innohproject/src/env/env_Colors.dart';
+import 'package:innohproject/src/env/current_log.dart';
+import 'package:innohproject/src/Views/start_view_vendedor.dart';
+import 'package:innohproject/src/Views/start_view_gerente.dart';
+import 'package:innohproject/src/Views/client_view.dart';
 
 class StartView extends StatelessWidget {
   const StartView({super.key});
@@ -23,29 +27,11 @@ class StartView extends StatelessWidget {
         ],
       ),
       drawer: CustomDrawer(),
-      body: Container(
-        width: double.infinity,
-        color: const Color.fromARGB(255, 245, 245, 245),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 24),
-            Text(
-              'Bienvenido al módulo de garantías',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: EnvColors.azulote,
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Seleccione una opción en el menú lateral',
-              style: TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-      ),
+      body: CurrentLog.employ!.role == 'Vendedor'
+          ? StartViewVendedor()
+          : CurrentLog.employ!.role == 'Gerente'
+          ? StartViewGerente()
+          : ClientView(),
     );
   }
 }

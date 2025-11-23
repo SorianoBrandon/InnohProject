@@ -19,7 +19,6 @@ class CustomDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-
           SizedBox(
             height: 280,
             child: Container(
@@ -74,7 +73,10 @@ class CustomDrawer extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         CurrentLog.employ!.phone,
-                        style: const TextStyle(color: Colors.white70, fontSize: 13),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
@@ -82,7 +84,10 @@ class CustomDrawer extends StatelessWidget {
                   Divider(color: Colors.white70, thickness: 2),
                   const SizedBox(height: 10),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(30),
@@ -103,12 +108,24 @@ class CustomDrawer extends StatelessWidget {
           ),
 
           drawerItemCliente(context),
-          drawerItemEmploy(context),
-          drawerItemBrands(context),
-          drawerItemTypeProduct(context),
-          drawerItemReports(context),
-          drawerItemGraphs(context),
-          drawerItemWarranty(context),
+          CurrentLog.employ!.role == 'Vendedor'
+              ? SizedBox()
+              : drawerItemEmploy(context),
+          CurrentLog.employ!.role == 'Vendedor'
+              ? SizedBox()
+              : drawerItemBrands(context),
+          CurrentLog.employ!.role == 'Vendedor'
+              ? SizedBox()
+              : drawerItemTypeProduct(context),
+          CurrentLog.employ!.role == 'Vendedor'
+              ? SizedBox()
+              : drawerItemReports(context),
+          CurrentLog.employ!.role == 'Vendedor'
+              ? SizedBox()
+              : drawerItemGraphs(context),
+          CurrentLog.employ!.role == 'Vendedor'
+              ? SizedBox()
+              : drawerItemWarranty(context),
         ],
       ),
     );
