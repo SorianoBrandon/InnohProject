@@ -7,6 +7,7 @@ class GrfBars extends StatelessWidget {
   final List<String> marcas;
   final String emitidoPor;
   final String subtitulo;
+  final String descripcion;
   final String titulo;
 
   const GrfBars({
@@ -15,6 +16,7 @@ class GrfBars extends StatelessWidget {
     required this.marcas,
     required this.emitidoPor,
     required this.subtitulo,
+    required this.descripcion,
     this.titulo = 'Garantías por Marca',
   });
 
@@ -155,8 +157,8 @@ class GrfBars extends StatelessWidget {
 
           // Pie de página
           const SizedBox(height: 8),
-          const Text(
-            'Fuente: Sistema Garantías Innovah',
+          Text(
+            'Fuente: Sistema Garantías Innovah \n${descripcion}',
             style: TextStyle(fontSize: 12, color: Colors.blueGrey),
           ),
           const Text(

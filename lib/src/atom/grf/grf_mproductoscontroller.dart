@@ -1,65 +1,36 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:innohproject/src/atom/warrantylistcontroller.dart';
 
 class GrfMproductoscontroller {
-  final FirebaseFirestore db = FirebaseFirestore.instance;
   static List<String> tipos = [];
 
-  /// Retorna el porcentaje de fallos por tipo de producto dentro de una marca específica
+  /// Calcula el porcentaje de fallos por tipo de producto dentro de una marca específica
   Future<Map<String, double>> calcularPorcentajeFallosPorTipo(
     String marcaFiltrada,
   ) async {
-    // 1. Obtener todas las garantías
-    final garantiasSnapshot = await db.collection('Garantias').get();
-    final garantias = garantiasSnapshot.docs;
+    final controller = Get.find<WarrantyListController>();
+    final garantias = controller.listaGgraficas;
 
     if (garantias.isEmpty) return {};
 
-    // 2. Extraer códigos únicos de producto desde las garantías
-    final codigos = garantias.map((g) => g['CodigoProducto']).toSet().toList();
-
-    // 3. Obtener productos relacionados con esos códigos
-    final productosSnapshot = await db
-        .collection('Productos')
-        .where('Codigo', whereIn: codigos)
-        .get();
-
-    final productos = productosSnapshot.docs;
-
-    // 4. Crear mapa de código → tipo (solo si la marca coincide)
-    final Map<String, String> mapaCodigoTipo = {};
-    final Set<String> codigosMarca = {};
-
-    for (var p in productos) {
-      if (p['Marca'] == marcaFiltrada) {
-        mapaCodigoTipo[p['Codigo']] = p['Tipo'];
-        codigosMarca.add(p['Codigo']);
-      }
-    }
-
-    // 5. Filtrar garantías que correspondan a productos de esa marca
+    // 1. Filtrar garantías de la marca indicada
     final garantiasMarca = garantias
-        .where((g) => codigosMarca.contains(g['CodigoProducto']))
+        .where((g) => g.marca == marcaFiltrada)
         .toList();
-
     if (garantiasMarca.isEmpty) return {};
 
-    // 6. Contar fallos por tipo
+    // 2. Contar fallos por tipo de producto
     final Map<String, int> conteoPorTipo = {};
-
     for (var g in garantiasMarca) {
-      final codigo = g['CodigoProducto'];
-      final tipo = mapaCodigoTipo[codigo];
-      if (tipo != null) {
-        conteoPorTipo[tipo] = (conteoPorTipo[tipo] ?? 0) + 1;
-      }
+      final tipo = g.tipoP.isNotEmpty ? g.tipoP : 'Desconocido';
+      conteoPorTipo[tipo] = (conteoPorTipo[tipo] ?? 0) + 1;
     }
 
-    // 7. Calcular porcentajes
+    // 3. Calcular porcentajes
     final totalFallos = garantiasMarca.length;
     final Map<String, double> porcentajePorTipo = {};
-
     for (var tipo in conteoPorTipo.keys) {
       final porcentaje = (conteoPorTipo[tipo]! / totalFallos) * 100;
       porcentajePorTipo[tipo] = porcentaje;

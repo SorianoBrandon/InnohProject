@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:innohproject/src/atom/textfieldscontroller.dart';
 import 'package:innohproject/src/auth/login_auth.dart';
@@ -26,6 +27,11 @@ class ClientLog extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           TextField(
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(13),
+            ],
             controller: clientCont.cont_DNI,
             decoration: InputDecoration(
               labelText: 'Numero de Identidad',
@@ -42,7 +48,7 @@ class ClientLog extends StatelessWidget {
                     : () async {
                         final dni = clientCont.cont_DNI.text.trim();
 
-                        if (dni.isEmpty) {
+                        if (dni.isEmpty || dni.length < 13) {
                           WarningSnackbar.show(
                             context,
                             "El DNI no puede estar vacío",

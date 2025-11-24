@@ -8,6 +8,7 @@ class Warranty {
   final DateTime fechaVencimiento;
   final String infoUser;
   final String marca;
+  final String tipoP;
   final String nFactura;
   final String ns;
   final String nombreCl;
@@ -26,6 +27,7 @@ class Warranty {
     required this.estado,
     required this.infoUser,
     required this.marca,
+    required this.tipoP,
     required this.nombreCl,
     required this.nombrePr,
     required this.telefonoCl,
@@ -47,6 +49,7 @@ class Warranty {
           : int.tryParse(json['Estado'].toString()) ?? 0,
       infoUser: json['InfoUser'] ?? '',
       marca: json['Marca'] ?? '',
+      tipoP: json['TipoP'] ?? '',
       nombreCl: json['NombreCl'] ?? '',
       nombrePr: json['NombrePr'] ?? '',
       telefonoCl: json['TelefonoCl'] ?? '',
@@ -65,6 +68,7 @@ class Warranty {
       'Estado': estado,
       'InfoUser': infoUser,
       'Marca': marca,
+      'TipoP': tipoP,
       'NombreCl': nombreCl,
       'NombrePr': nombrePr,
       'TelefonoCl': telefonoCl,

@@ -17,7 +17,11 @@ class StartView extends StatelessWidget {
         automaticallyImplyLeading: true,
         title: const Text(
           'Garantías Innovah Comercial',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         actions: [
           Padding(

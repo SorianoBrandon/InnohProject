@@ -9,21 +9,18 @@ import 'package:innohproject/src/models/mdl_warranty.dart';
 
 class ChatBox extends StatelessWidget {
   final Warranty garantia;
-  final String garantiaId; 
+  final String garantiaId;
 
-  const ChatBox({
-    super.key,
-    required this.garantia,
-    required this.garantiaId,
-  });
+  const ChatBox({super.key, required this.garantia, required this.garantiaId});
 
-  bool isMyMessage(String usuario) =>
-      usuario == (CurrentLog.employ != null ? "Gerente" : "Cliente");
+  bool isMyMessage(String usuario) {
+    return usuario == (CurrentLog.employ != null ? "Gerente" : "Cliente");
+  }
 
   @override
   Widget build(BuildContext context) {
     final chatController = Get.put(ChatController());
-    chatController.setWarrantyId(garantiaId); 
+    chatController.setWarrantyId(garantiaId);
 
     return Column(
       children: [
@@ -31,7 +28,7 @@ class ChatBox extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           color: EnvColors.verdete,
           child: Text(
-            garantia.nombrePr, 
+            garantia.nombrePr,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -45,7 +42,7 @@ class ChatBox extends StatelessWidget {
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('Garantias')
-                .doc(chatController.warrantyId.value) 
+                .doc(chatController.warrantyId.value)
                 .collection('Mensajes')
                 .orderBy('Fecha')
                 .snapshots(),

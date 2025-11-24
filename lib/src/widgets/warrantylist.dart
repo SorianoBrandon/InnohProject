@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:innohproject/src/custom/report%20generators/reimpresion_report.dart';
 import 'package:innohproject/src/env/current_log.dart';
 import 'package:innohproject/src/env/env_Colors.dart';
 import 'package:innohproject/src/atom/warrantylistcontroller.dart';
 import 'package:innohproject/src/helpers/snackbars.dart';
 import 'package:innohproject/src/models/mdl_warranty.dart';
+import 'package:printing/printing.dart';
 
 class WarrantyList extends StatelessWidget {
   final void Function(Warranty, String)? onSelect;
@@ -65,22 +67,22 @@ class WarrantyList extends StatelessWidget {
                   ),
 
                   // Footer con acciones
-                  if (!esGerente)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: EnvColors.azulote.withOpacity(0.05),
+                      borderRadius: const BorderRadius.vertical(
+                        bottom: Radius.circular(12),
                       ),
-                      decoration: BoxDecoration(
-                        color: EnvColors.azulote.withOpacity(0.05),
-                        borderRadius: const BorderRadius.vertical(
-                          bottom: Radius.circular(12),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // Botón de iniciar/finalizar
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Botón iniciar/finalizar (para empleados)
+                        if (!esGerente)
                           Column(
                             children: [
                               TextButton.icon(
@@ -147,30 +149,84 @@ class WarrantyList extends StatelessWidget {
                             ],
                           ),
 
-                          // Botón de imprimir
+                        // Botón de imprimir (todos)
+                        Column(
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.picture_as_pdf,
+                                color: Colors.orange,
+                                size: 28,
+                              ),
+                              onPressed: () async {
+                                try {
+                                  final pdf =
+                                      await ReportGarantiaReimpresion.build(
+                                        garantiaId: g.dni + g.ns,
+                                      );
+                                  await Printing.layoutPdf(
+                                    onLayout: (format) async => pdf.save(),
+                                  );
+                                } catch (e) {
+                                  ErrorSnackbar.show(
+                                    context,
+                                    "Error al generar la hoja de garantía: $e",
+                                  );
+                                }
+                              },
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              "Imp Hoja Garantia",
+                              style: TextStyle(fontSize: 11),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+
+                        // Botón de cerrar reclamo (solo gerente)
+                        if (esGerente)
                           Column(
                             children: [
-                              IconButton(
+                              TextButton.icon(
+                                label: const Text("Cerrar Reclamo"),
                                 icon: const Icon(
-                                  Icons.picture_as_pdf,
-                                  color: Colors.orange,
-                                  size: 28,
+                                  Icons.close,
+                                  color: Colors.red,
+                                  size: 25,
                                 ),
-                                onPressed: () {
-                                  // hoja de garantia
+                                onPressed: () async {
+                                  ConfirmActionDialog.show(
+                                    context: context,
+                                    message:
+                                        "¿Desea dar por finalizada la conversación de reclamo?",
+                                    onConfirm: () async {
+                                      await FirebaseFirestore.instance
+                                          .collection('Garantias')
+                                          .doc(g.dni + g.ns)
+                                          .update({
+                                            'Estado': 0, // vuelve a estado base
+                                            'NumIncidente':
+                                                (g.numIncidente) + 1, // suma 1
+                                          });
+                                    },
+                                    onDenied: () {
+                                      null;
+                                    },
+                                  );
                                 },
                               ),
                               const SizedBox(height: 4),
                               const Text(
-                                "Imp Hoja Garantia",
+                                "Finalizar Reclamo",
                                 style: TextStyle(fontSize: 11),
                                 textAlign: TextAlign.center,
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                      ],
                     ),
+                  ),
                 ],
               ),
             ),

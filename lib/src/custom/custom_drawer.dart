@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:innohproject/src/custom/custom_draweritem_brands.dart';
 import 'package:innohproject/src/custom/custom_draweritem_clients.dart';
 import 'package:innohproject/src/custom/custom_draweritem_employ.dart';
-import 'package:innohproject/src/custom/custom_draweritem_graph.dart';
 import 'package:innohproject/src/custom/custom_draweritem_logout.dart';
+import 'package:innohproject/src/custom/custom_draweritem_products.dart';
 import 'package:innohproject/src/custom/custom_draweritem_reports.dart';
 import 'package:innohproject/src/custom/custom_draweritem_typeproduct.dart';
 import 'package:innohproject/src/custom/custom_draweritem_warranty.dart';
@@ -117,13 +117,13 @@ class CustomDrawer extends StatelessWidget {
               : drawerItemBrands(context),
           CurrentLog.employ!.role == 'Vendedor'
               ? SizedBox()
+              : drawerItemProducto(context),
+          CurrentLog.employ!.role == 'Vendedor'
+              ? SizedBox()
               : drawerItemTypeProduct(context),
           CurrentLog.employ!.role == 'Vendedor'
               ? SizedBox()
               : drawerItemReports(context),
-          CurrentLog.employ!.role == 'Vendedor'
-              ? SizedBox()
-              : drawerItemGraphs(context),
           CurrentLog.employ!.role == 'Vendedor'
               ? SizedBox()
               : drawerItemWarranty(context),

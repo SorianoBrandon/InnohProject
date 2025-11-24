@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:innohproject/src/Views/modal/filtromesMarca.dart';
+import 'package:innohproject/src/Views/modal/filtromesMarcas.dart';
+import 'package:innohproject/src/Views/modal/filtromesTipo.dart';
+import 'package:innohproject/src/atom/tap_Effect.dart';
 import 'package:innohproject/src/atom/warrantylistcontroller.dart';
 import 'package:innohproject/src/widgets/chatbox.dart';
 import 'package:innohproject/src/widgets/graphicscard.dart';
@@ -23,32 +27,89 @@ class StartViewGerente extends StatelessWidget {
               // Garantías arriba con scroll
               Expanded(
                 flex: 2,
-                child: SingleChildScrollView(child: WarrantyList()),
+                child: SingleChildScrollView(
+                  child: WarrantyList(
+                    onSelect: (g, id) {
+                      controller.seleccionarGarantia(g, id);
+                    },
+                  ),
+                ),
               ),
 
               const SizedBox(height: 16),
 
               // Gráficas abajo como cards pequeñas
+              // Gráficas abajo ocupando todo el espacio disponible
               Expanded(
                 flex: 1,
-                child: Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
+                child: Row(
                   children: [
-                    graphicCard(
-                      context: context,
-                      title: 'Porcentaje de Fallas Entre Marcas',
-                      chartId: 1,
+                    Expanded(
+                      child: TapEffect(
+                        child: graphicCard(
+                          context: context,
+                          title: 'Fallas de Productos Entre Marcas',
+                          chartId: 1,
+                        ),
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
+                            ),
+                            builder: (context) => const FiltroGarantiasModal(),
+                          );
+                        },
+                      ),
                     ),
-                    graphicCard(
-                      context: context,
-                      title: 'Fallas Productos de Marca',
-                      chartId: 2,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TapEffect(
+                        child: graphicCard(
+                          context: context,
+                          title: 'Falla Productos de una Marca Especifica',
+                          chartId: 2,
+                        ),
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
+                            ),
+                            builder: (context) =>
+                                const FiltroGarantiasPorMarcaModal(),
+                          );
+                        },
+                      ),
                     ),
-                    graphicCard(
-                      context: context,
-                      title: 'Falla Producto Entre Tipos',
-                      chartId: 3,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TapEffect(
+                        child: graphicCard(
+                          context: context,
+                          title: 'Falla Tipo de Producto Entre Marcas',
+                          chartId: 3,
+                        ),
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
+                            ),
+                            builder: (context) =>
+                                const FiltroGarantiasPorTipoModal(),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),

@@ -7,7 +7,7 @@ import 'package:innohproject/src/widgets/draweritem.dart';
 DrawerItem drawerItemLogout(BuildContext context) {
   return DrawerItem(
     icon: Icons.logout_outlined,
-    title: "Cesarrar Sesión",
+    title: "Cerrar Sesión",
     color: EnvColors.verdesote,
     onTap: () async {
       context.pop();
