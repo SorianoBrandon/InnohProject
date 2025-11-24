@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 //no me preguntes ni madres de esto,nomas me canse de escribir la garantias a mano
 class Warrantycontroller extends GetxController {
   // Estados
@@ -93,5 +92,18 @@ class Warrantycontroller extends GetxController {
     fechaVenc.value = null;
     estado.value = 0;
     mensaje.value = '';
+  }
+
+  DateTime sumarMeses(DateTime fecha, int meses) {
+    int nuevoAnio = fecha.year;
+    int nuevoMes = fecha.month + meses;
+
+    nuevoAnio += (nuevoMes - 1) ~/ 12;
+    nuevoMes = ((nuevoMes - 1) % 12) + 1;
+
+    int ultimoDiaMes = DateTime(nuevoAnio, nuevoMes + 1, 0).day;
+    int nuevoDia = fecha.day <= ultimoDiaMes ? fecha.day : ultimoDiaMes;
+
+    return DateTime(nuevoAnio, nuevoMes, nuevoDia);
   }
 }

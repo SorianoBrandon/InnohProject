@@ -1,153 +1,182 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:innohproject/src/env/current_log.dart';
 import 'package:innohproject/src/env/env_Colors.dart';
+import 'package:innohproject/src/atom/warrantylistcontroller.dart';
+import 'package:innohproject/src/helpers/snackbars.dart';
 import 'package:innohproject/src/models/mdl_warranty.dart';
 
 class WarrantyList extends StatelessWidget {
-  final int? estadoFiltrado;
-  final String? dniCliente;
-  final void Function(Warranty)? onSelect;
+  final void Function(Warranty, String)? onSelect;
 
-  const WarrantyList({
-    super.key,
-    this.estadoFiltrado,
-    this.dniCliente,
-    this.onSelect,
-  });
-
-
-  Future<String> obtenerNombreCliente(String dni) async {
-    final doc = await FirebaseFirestore.instance
-        .collection('Clientes')
-        .doc(dni)
-        .get();
-    return doc.data()?['Name'] ?? 'Cliente desconocido';
-  }
-
-  Future<String> obtenerTelefono(String dni) async {
-    final doc = await FirebaseFirestore.instance
-        .collection('Clientes')
-        .doc(dni)
-        .get();
-    return doc.data()?['Phone'] ?? 'Numero desconocido';
-  }
-
-
-  Future<String> obtenerTipoYDescripcion(String codigoProducto) async {
-  final doc = await FirebaseFirestore.instance
-      .collection('Productos')
-      .doc(codigoProducto)
-      .get();
-
-  final tipo = doc.data()?['Tipo'] ?? 'Tipo desconocido';
-  final descripcion = doc.data()?['Descripcion'] ?? 'Producto desconocido';
-
-  return "$tipo - $descripcion"; 
-}
-
+  WarrantyList({super.key, this.onSelect});
+  final controller = Get.find<WarrantyListController>();
+  final esGerente = CurrentLog.employ != null;
 
   @override
   Widget build(BuildContext context) {
-    Query query = FirebaseFirestore.instance.collection('Garantias');
+    return Obx(() {
+      if (controller.listaGarantias.isEmpty) {
+        return const Center(child: Text('No hay garantías registradas'));
+      }
 
-    //Si hay filtro por estado
-    if (estadoFiltrado != null) {
-      query = query.where('Estado', isEqualTo: estadoFiltrado);
-    }
+      return ListView.builder(
+        shrinkWrap: true,
+        itemCount: controller.listaGarantias.length,
+        itemBuilder: (context, index) {
+          final g = controller.listaGarantias[index]; // ✅ acceso directo
 
-    //Si hay filtro por DNI (vista cliente)
-    if (dniCliente != null) {
-      query = query.where('DNI', isEqualTo: dniCliente);
-    }
+          return InkWell(
+            onTap: () {
+              onSelect?.call(g, g.dni + g.ns);
+            },
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 3,
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Encabezado con icono y título
+                  ListTile(
+                    leading: Icon(Icons.inventory, color: EnvColors.verdete),
+                    title: Text(
+                      g.nombrePr,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: esGerente
+                        ? Text(
+                            "Cliente: ${g.nombreCl}\nTel: ${g.telefonoCl}\nDNI: ${g.dni}",
+                          )
+                        : Text(
+                            "Inicio: ${g.fechaEntrada.toLocal().toString().split(' ')[0]}\n"
+                            "Vence: ${g.fechaVencimiento.toLocal().toString().split(' ')[0]}\n"
+                            "Estado: ${g.estado == 1 ? "En proceso" : "Sin iniciar"}",
+                          ),
+                    trailing: esGerente
+                        ? const Icon(Icons.check_circle, color: Colors.green)
+                        : null,
+                  ),
 
-  return StreamBuilder<QuerySnapshot>(
-  stream: query.snapshots(),
-  builder: (context, snapshot) {
-    if (!snapshot.hasData) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    final garantias = snapshot.data!.docs.map((doc) {
-      final w = Warranty.fromJson(doc.data() as Map<String, dynamic>);
-      w.docId = doc.id; 
-      return w;
-    }).toList();
-
-    if (garantias.isEmpty) {
-      return const Center(child: Text('No hay garantías registradas'));
-    }
-
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: garantias.length,
-      itemBuilder: (context, index) {
-        final g = garantias[index]; 
-
-        return FutureBuilder<List<String>>(
-          future: Future.wait([
-            obtenerTipoYDescripcion(g.codigoProducto),
-            obtenerNombreCliente(g.dni),
-            obtenerTelefono(g.dni),
-          ]),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Padding(
-                padding: EdgeInsets.all(12),
-                child: LinearProgressIndicator(),
-              );
-            }
-
-            final tipoDescripcion  = snapshot.data![0];
-            final nombreCliente = snapshot.data![1];
-            final telefonoCliente = snapshot.data![2];
-
-
-            // Tarjeta de garantía 
-            return InkWell(
-              onTap: () {
-                g.tituloProducto = tipoDescripcion;
-                onSelect?.call(g);// Llama al callback con la garantía seleccionada
-              },
-              child: Card(
-                color: index % 2 == 0
-                    ? EnvColors.azulote
-                    : EnvColors.verdete,
-                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        tipoDescripcion ,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                  // Footer con acciones
+                  if (!esGerente)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: EnvColors.azulote.withOpacity(0.05),
+                        borderRadius: const BorderRadius.vertical(
+                          bottom: Radius.circular(12),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text('Cliente: $nombreCliente',
-                          style: const TextStyle(color: Colors.white)),
-                      Text('Tel: $telefonoCliente',
-                          style: const TextStyle(color: Colors.white)),
-                      Text('DNI: ${g.dni}',
-                          style: const TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  },
-);
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          // Botón de iniciar/finalizar
+                          Column(
+                            children: [
+                              TextButton.icon(
+                                label: Text(
+                                  g.estado == 1 ? "Finalizar" : "Iniciar",
+                                ),
+                                icon: Icon(
+                                  g.estado == 1
+                                      ? Icons.stop_circle
+                                      : Icons.play_circle,
+                                  color: g.estado == 1
+                                      ? Colors.red
+                                      : Colors.green,
+                                  size: 25,
+                                ),
+                                onPressed: () {
+                                  g.estado == 1
+                                      ? ConfirmActionDialog.show(
+                                          context: context,
+                                          message:
+                                              "¿Desea finalizar el proceso de garantía?",
+                                          onConfirm: () async {
+                                            await FirebaseFirestore.instance
+                                                .collection('Garantias')
+                                                .doc(g.dni + g.ns)
+                                                .update({
+                                                  'Estado': g.estado == 0
+                                                      ? 1
+                                                      : 0,
+                                                });
+                                          },
+                                          onDenied: () {
+                                            null;
+                                          },
+                                        )
+                                      : ConfirmActionDialog.show(
+                                          context: context,
+                                          message:
+                                              "¿Desea iniciar el proceso de garantía?",
+                                          onConfirm: () async {
+                                            await FirebaseFirestore.instance
+                                                .collection('Garantias')
+                                                .doc(g.dni + g.ns)
+                                                .update({
+                                                  'Estado': g.estado == 0
+                                                      ? 1
+                                                      : 0,
+                                                });
+                                          },
+                                          onDenied: () {
+                                            null;
+                                          },
+                                        );
+                                },
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                g.estado == 1
+                                    ? "Finalizar Proceso Garantia"
+                                    : "Iniciar Proceso Garantia",
+                                style: const TextStyle(fontSize: 11),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
 
+                          // Botón de imprimir
+                          Column(
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.picture_as_pdf,
+                                  color: Colors.orange,
+                                  size: 28,
+                                ),
+                                onPressed: () {
+                                  // hoja de garantia
+                                },
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                "Imp Hoja Garantia",
+                                style: TextStyle(fontSize: 11),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    });
   }
 }

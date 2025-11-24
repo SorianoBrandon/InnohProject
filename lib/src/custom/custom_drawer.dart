@@ -3,6 +3,7 @@ import 'package:innohproject/src/custom/custom_draweritem_brands.dart';
 import 'package:innohproject/src/custom/custom_draweritem_clients.dart';
 import 'package:innohproject/src/custom/custom_draweritem_employ.dart';
 import 'package:innohproject/src/custom/custom_draweritem_graph.dart';
+import 'package:innohproject/src/custom/custom_draweritem_logout.dart';
 import 'package:innohproject/src/custom/custom_draweritem_reports.dart';
 import 'package:innohproject/src/custom/custom_draweritem_typeproduct.dart';
 import 'package:innohproject/src/custom/custom_draweritem_warranty.dart';
@@ -126,6 +127,7 @@ class CustomDrawer extends StatelessWidget {
           CurrentLog.employ!.role == 'Vendedor'
               ? SizedBox()
               : drawerItemWarranty(context),
+          drawerItemLogout(context),
         ],
       ),
     );

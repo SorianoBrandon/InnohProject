@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:innohproject/src/env/current_log.dart';
 import 'package:innohproject/src/env/env_Colors.dart';
-import 'package:innohproject/src/models/mdl_warranty.dart';
+import 'package:innohproject/src/widgets/chatbox.dart';
 import 'package:innohproject/src/widgets/warrantylist.dart';
 import 'package:innohproject/src/atom/warrantylistcontroller.dart';
 
 class ClientView extends StatelessWidget {
-  const ClientView({super.key});
+  ClientView({super.key});
+  final controller = Get.put(WarrantyListController());
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(WarrantyListController());
+    controller.listaGarDni(CurrentLog.client!.dni);
 
     return Scaffold(
       appBar: AppBar(
@@ -54,13 +55,29 @@ class ClientView extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: WarrantyList(
-                    dniCliente: CurrentLog.client!.dni,
-                    onSelect: (g) {
-                      mostrarConfirmacion(context, g);
+                    onSelect: (g, id) {
+                      Get.find<WarrantyListController>().seleccionarGarantia(
+                        g,
+                        id,
+                      );
                     },
                   ),
                 ),
-                Expanded(flex: 3, child: SizedBox()),
+                Expanded(
+                  flex: 3,
+                  child: Obx(() {
+                    final selected = controller.garantiaSeleccionada.value;
+                    final selectedId = controller.garantiaId.value;
+                    if (selected == null || selectedId == null) {
+                      return const Center(
+                        child: Text(
+                          "Seleccione una garantía para iniciar el chat",
+                        ),
+                      );
+                    }
+                    return ChatBox(garantia: selected, garantiaId: selectedId);
+                  }),
+                ),
               ],
             ),
           ),
@@ -70,27 +87,4 @@ class ClientView extends StatelessWidget {
   }
 
   // Función para mostrar el diálogo de confirmación
-  void mostrarConfirmacion(BuildContext context, Warranty g) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        title: const Text("¿Iniciar proceso de garantía?"),
-        content: const Text("¿Desea iniciar un proceso con esta garantía?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(), // No
-            child: const Text("No"),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Sí
-              Get.find<WarrantyListController>().seleccionarGarantia(g);
-            },
-            child: const Text("Sí"),
-          ),
-        ],
-      ),
-    );
-  }
 }

@@ -8,19 +8,19 @@ import 'package:innohproject/src/widgets/draweritem.dart';
 
 DrawerItem drawerItemTypeProduct(BuildContext context) {
   return DrawerItem(
-            icon: Icons.category_outlined,
-            title: "Tipos de Productos",
-            color: EnvColors.azulito,
-            onTap: () {
-              context.pop();
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                builder: (_) {
-                  Get.put(TypeController());
-                  return TypeMdl();
-                },
-              ).then((_) => Get.delete<TypeController>());
-            },
-          );
+    icon: Icons.category_outlined,
+    title: "Tipos de Productos",
+    color: EnvColors.verdete,
+    onTap: () {
+      context.pop();
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (_) {
+          Get.put(TypeController());
+          return TypeMdl();
+        },
+      ).then((_) => Get.delete<TypeController>());
+    },
+  );
 }

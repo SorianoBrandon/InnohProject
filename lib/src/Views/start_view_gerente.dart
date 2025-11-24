@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:innohproject/src/atom/warrantylistcontroller.dart';
+import 'package:innohproject/src/widgets/chatbox.dart';
 import 'package:innohproject/src/widgets/graphicscard.dart';
 import 'package:innohproject/src/widgets/warrantylist.dart';
 
@@ -9,7 +10,9 @@ class StartViewGerente extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(WarrantyListController());
+    final controller = Get.put(WarrantyListController());
+    controller.listaGarProceso();
+
     return Row(
       children: [
         // Sección izquierda
@@ -55,9 +58,20 @@ class StartViewGerente extends StatelessWidget {
         ),
 
         // Columna derecha faltaria meter el chat de parte del gerente
-        const Expanded(
+        Expanded(
           flex: 1,
-          child: SizedBox.shrink(), //por mientras
+          child: Obx(() {
+            final selected = controller.garantiaSeleccionada.value;
+            if (selected == null) {
+              return const Center(
+                child: Text("Selecciona una garantía para ver el chat"),
+              );
+            }
+            return ChatBox(
+              garantia: selected,
+              garantiaId: controller.garantiaId.value!,
+            );
+          }),
         ),
       ],
     );

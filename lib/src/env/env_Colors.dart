@@ -6,4 +6,5 @@ class EnvColors {
   static Color verdete = Color(0xFF28a133);
   static Color verdecito = Color(0xFF94f69d);
   static Color fondo = Color(0xFFf3f3f3);
+  static Color verdesote = Color(0xFF057120);
 }

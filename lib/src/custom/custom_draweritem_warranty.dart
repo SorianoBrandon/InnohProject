@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:innohproject/src/Views/modal/warrant_mdl.dart';
@@ -16,13 +15,13 @@ DrawerItem drawerItemWarranty(BuildContext context) {
       Navigator.of(context).pop();
       Get.put(Warrantycontroller());
       showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => GarantiaFormModal(infoUser: 'admin'),
-    ).then((_) {
-      if (Get.isRegistered<Warrantycontroller>()) Get.delete<Warrantycontroller>();
-    });
+        context: context,
+        isScrollControlled: true,
+        builder: (_) => GarantiaFormModal(infoUser: 'admin'),
+      ).then((_) {
+        if (Get.isRegistered<Warrantycontroller>())
+          Get.delete<Warrantycontroller>();
+      });
     },
-    );  
+  );
 }
-

@@ -7,7 +7,7 @@ DrawerItem drawerItemGraphs(BuildContext context) {
   return DrawerItem(
     icon: Icons.pie_chart_outline,
     title: "Graficas",
-    color: EnvColors.azulito,
+    color: EnvColors.verdete,
     onTap: () {
       showModalBottomSheet(
         context: context,

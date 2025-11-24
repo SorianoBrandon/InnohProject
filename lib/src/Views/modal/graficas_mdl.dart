@@ -5,6 +5,7 @@ import 'package:innohproject/src/atom/grf/grf_mproductoscontroller.dart';
 import 'package:innohproject/src/atom/grf/grf_pmarcascontroller.dart';
 import 'package:innohproject/src/env/current_log.dart';
 import 'package:innohproject/src/widgets/grf_bars.dart';
+import 'package:innohproject/src/widgets/warrantytable.dart';
 
 class GraficasdMdl extends StatelessWidget {
   const GraficasdMdl({super.key});
@@ -13,91 +14,125 @@ class GraficasdMdl extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          top: 20,
-          left: 20,
-          right: 20,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                titulo,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+      backgroundColor:
+          Colors.transparent, // transparente para que se vea el borde
+      builder: (context) => SizedBox.expand(
+        // ✅ ocupa todo el ancho y alto
+        child: Material(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Encabezado con botón de cierre
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      titulo,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 16),
-              Builder(
-                builder: (context) {
-                  switch (grf) {
-                    case 1:
-                      return FutureBuilder<List<BarChartGroupData>>(
-                        future: GrfMarcasController().generarDatosBarra(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const CircularProgressIndicator();
-                          }
-                          return GrfBars(
-                            datos: snapshot.data!,
-                            emitidoPor: CurrentLog.employ!.user,
-                            marcas: GrfMarcasController.marcas,
-                            subtitulo: 'Reporte Total',
-                          );
-                        },
-                      );
-                    case 2:
-                      return FutureBuilder<List<BarChartGroupData>>(
-                        future: GrfMproductoscontroller()
-                            .generarDatosBarraPorTipo('Sony'),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const CircularProgressIndicator();
-                          }
-                          return GrfBars(
-                            datos: snapshot.data!,
-                            emitidoPor: CurrentLog.employ!.user,
-                            marcas: GrfMproductoscontroller.tipos,
-                            titulo: 'Fallo de Productos',
-                            subtitulo: 'Marca Sony',
-                          );
-                        },
-                      );
-                    case 3:
-                      return FutureBuilder<List<BarChartGroupData>>(
-                        future: GrfPmarcascontroller().generarDatosBarraPorTipo(
-                          'Consola',
+                const SizedBox(height: 16),
+
+                // Contenido principal
+                Expanded(
+                  child: Row(
+                    children: [
+                      // Panel izquierdo: gráfica
+                      Expanded(
+                        flex: 3,
+                        child: Builder(
+                          builder: (context) {
+                            switch (grf) {
+                              case 1:
+                                return FutureBuilder<List<BarChartGroupData>>(
+                                  future: GrfMarcasController()
+                                      .generarDatosBarra(),
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    }
+                                    return GrfBars(
+                                      datos: snapshot.data!,
+                                      emitidoPor: CurrentLog.employ!.user,
+                                      marcas: GrfMarcasController.marcas,
+                                      subtitulo: 'Reporte Total',
+                                    );
+                                  },
+                                );
+                              case 2:
+                                return FutureBuilder<List<BarChartGroupData>>(
+                                  future: GrfMproductoscontroller()
+                                      .generarDatosBarraPorTipo('Sony'),
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    }
+                                    return GrfBars(
+                                      datos: snapshot.data!,
+                                      emitidoPor: CurrentLog.employ!.user,
+                                      marcas: GrfMproductoscontroller.tipos,
+                                      titulo: 'Fallo de Productos',
+                                      subtitulo: 'Marca Sony',
+                                    );
+                                  },
+                                );
+                              case 3:
+                                return FutureBuilder<List<BarChartGroupData>>(
+                                  future: GrfPmarcascontroller()
+                                      .generarDatosBarraPorTipo('Consola'),
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    }
+                                    return GrfBars(
+                                      datos: snapshot.data!,
+                                      emitidoPor: CurrentLog.employ!.user,
+                                      marcas: GrfPmarcascontroller.marcas,
+                                      titulo:
+                                          'Fallo Tipo de Producto entre Marcas',
+                                      subtitulo: 'Tipo Consolas',
+                                    );
+                                  },
+                                );
+                              default:
+                                return const Text(
+                                  'Tipo de gráfico no reconocido',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.red,
+                                  ),
+                                );
+                            }
+                          },
                         ),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const CircularProgressIndicator();
-                          }
-                          return GrfBars(
-                            datos: snapshot.data!,
-                            emitidoPor: CurrentLog.employ!.user,
-                            marcas: GrfPmarcascontroller.marcas,
-                            titulo: 'Fallo Tipo de Producto entre Marcas',
-                            subtitulo: 'Tipo Consolas',
-                          );
-                        },
-                      );
-                    default:
-                      return const Text(
-                        'Tipo de gráfico no reconocido',
-                        style: TextStyle(fontSize: 16, color: Colors.red),
-                      );
-                  }
-                },
-              ),
-            ],
+                      ),
+
+                      const SizedBox(width: 16),
+
+                      // Panel derecho: tabla con scrollbars
+                      Expanded(flex: 4, child: WarrantyTable()),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
