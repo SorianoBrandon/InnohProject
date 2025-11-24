@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:innohproject/src/atom/clientcontroller.dart';
 import 'package:innohproject/src/env/env_Colors.dart';
@@ -33,6 +34,11 @@ class ClientMdl extends StatelessWidget {
                 Obx(
                   () => Expanded(
                     child: TextField(
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(13),
+                      ],
                       enabled: !controller.isSearching.value,
                       controller: controller.cont_dni,
                       decoration: InputDecoration(
@@ -47,7 +53,8 @@ class ClientMdl extends StatelessWidget {
                   () => ElevatedButton(
                     onPressed: !controller.isSearching.value
                         ? () async {
-                            if (controller.cont_dni.text.trim().isEmpty) {
+                            if (controller.cont_dni.text.trim().isEmpty ||
+                                controller.cont_dni.text.length < 13) {
                               WarningSnackbar.show(
                                 context,
                                 "Debe completar la Identidad del cliente.",

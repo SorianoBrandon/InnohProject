@@ -14,7 +14,8 @@ class ChatBox extends StatelessWidget {
   const ChatBox({super.key, required this.garantia, required this.garantiaId});
 
   bool isMyMessage(String usuario) {
-    return usuario == (CurrentLog.employ != null ? "Gerente" : "Cliente");
+    final currentUserId = CurrentLog.employ?.role ?? "Cliente";
+    return usuario == currentUserId;
   }
 
   @override

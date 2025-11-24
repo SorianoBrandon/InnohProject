@@ -189,7 +189,7 @@ class WarrantyList extends StatelessWidget {
                           Column(
                             children: [
                               TextButton.icon(
-                                label: const Text("Cerrar Reclamo"),
+                                label: const Text("Finalizar Reclamo"),
                                 icon: const Icon(
                                   Icons.close,
                                   color: Colors.red,
@@ -201,14 +201,28 @@ class WarrantyList extends StatelessWidget {
                                     message:
                                         "¿Desea dar por finalizada la conversación de reclamo?",
                                     onConfirm: () async {
-                                      await FirebaseFirestore.instance
-                                          .collection('Garantias')
-                                          .doc(g.dni + g.ns)
-                                          .update({
-                                            'Estado': 0, // vuelve a estado base
-                                            'NumIncidente':
-                                                (g.numIncidente) + 1, // suma 1
-                                          });
+                                      try {
+                                        await FirebaseFirestore.instance
+                                            .collection('Garantias')
+                                            .doc(g.dni + g.ns)
+                                            .update({
+                                              'Estado': 0,
+                                              'NumIncidente':
+                                                  (g.numIncidente) + 1,
+                                            });
+
+                                        controller.listaGarantias.removeWhere(
+                                          (gar) =>
+                                              gar.dni + gar.ns == g.dni + g.ns,
+                                        );
+                                        controller.listaGarantias.refresh();
+                                        Navigator.pop(context);
+                                      } catch (e) {
+                                        ErrorSnackbar.show(
+                                          context,
+                                          "Error al finalizar garantía: $e",
+                                        );
+                                      }
                                     },
                                     onDenied: () {
                                       null;

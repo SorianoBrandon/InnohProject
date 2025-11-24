@@ -16,13 +16,13 @@ class ChatController extends GetxController {
 
   Future<void> enviarMensaje() async {
     final texto = textController.text.trim();
+    final currentRole = CurrentLog.employ?.role ?? "Cliente";
+
     if (texto.isEmpty || warrantyId.value.isEmpty) return;
 
     final mensaje = MensajeModel(
       texto: texto,
-      usuario: CurrentLog.employ != null
-          ? "Gerente"
-          : "Cliente",
+      usuario: currentRole,
       fecha: DateTime.now(),
     );
 
