@@ -3,8 +3,10 @@ import 'package:innohproject/src/custom/custom_topgarantias.dart';
 import 'package:innohproject/src/custom/report%20generators/general_report.dart';
 import 'package:innohproject/src/custom/report%20generators/procesos_report.dart';
 import 'package:innohproject/src/custom/report%20generators/reincidencias_report.dart';
-import 'package:innohproject/src/widgets/reportdescriber.dart';
+import 'package:innohproject/src/helpers/snackbars.dart';
 import 'package:innohproject/src/env/env_Colors.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 enum ReportFilterType { none, semanal, quincenal, mensual, trimestral }
 
@@ -71,6 +73,15 @@ class _ReportListWarrantyMdlState extends State<ReportListWarrantyMdl> {
                 type: ReportFilterType.semanal,
                 child: Column(
                   children: [
+                    Text(
+                      "Reporte de Garantías en Proceso",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey, // 👈 subtítulo más tenue
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     // Scroll infinito de semanas
                     SizedBox(
                       height: 100,
@@ -107,17 +118,12 @@ class _ReportListWarrantyMdlState extends State<ReportListWarrantyMdl> {
                     const SizedBox(height: 12),
                     _buildYearWheel(),
                     const SizedBox(height: 12),
-                    _buildButtons(activeFilter == ReportFilterType.semanal),
-                    const SizedBox(height: 12),
-                    ReportDescriber(
-                      title: 'Productos en Proceso de Garantías',
-                      description:
-                          'Listado solo de garantías con estado en proceso',
+                    _buildButtons(
+                      activeFilter == ReportFilterType.semanal,
                       buildPdf: ProcesosReport.build,
                       filename: 'ProductosProcesosGarantias.pdf',
-                      previewColor: EnvColors.azulito,
-                      pdfColor: EnvColors.verdete,
                     ),
+                    const SizedBox(height: 12),
                   ],
                 ),
               ),
@@ -130,6 +136,14 @@ class _ReportListWarrantyMdlState extends State<ReportListWarrantyMdl> {
                 type: ReportFilterType.quincenal,
                 child: Column(
                   children: [
+                    Text(
+                      "Reporte General de Garantías",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey, // 👈 subtítulo más tenue
+                      ),
+                    ),
                     DropdownButtonFormField<int>(
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
@@ -155,17 +169,12 @@ class _ReportListWarrantyMdlState extends State<ReportListWarrantyMdl> {
                     const SizedBox(height: 12),
                     _buildYearWheel(),
                     const SizedBox(height: 12),
-                    _buildButtons(activeFilter == ReportFilterType.quincenal),
-                    const SizedBox(height: 12),
-                    ReportDescriber(
-                      title: 'Listado General de Garantías',
-                      description:
-                          'Genera una lista detallada de todas las garantías',
+                    _buildButtons(
+                      activeFilter == ReportFilterType.quincenal,
                       buildPdf: GeneralReport.build,
-                      filename: 'ListadoGarantiasGeneral.pdf',
-                      previewColor: EnvColors.azulito,
-                      pdfColor: EnvColors.verdete,
+                      filename: 'ListaGeneralGarantias.pdf',
                     ),
+                    const SizedBox(height: 12),
                   ],
                 ),
               ),
@@ -178,21 +187,25 @@ class _ReportListWarrantyMdlState extends State<ReportListWarrantyMdl> {
                 type: ReportFilterType.mensual,
                 child: Column(
                   children: [
+                    Text(
+                      "Garantia de Reincidencias",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey,
+                      ),
+                    ),
                     _buildMonthSelector(),
                     const SizedBox(height: 12),
                     _buildYearWheel(),
                     const SizedBox(height: 12),
-                    _buildButtons(activeFilter == ReportFilterType.mensual),
-                    const SizedBox(height: 12),
-                    ReportDescriber(
-                      title: 'Productos con Reincidencia de Garantías',
-                      description:
-                          'Lista todos los productos con reincidencias',
+
+                    _buildButtons(
+                      activeFilter == ReportFilterType.mensual,
                       buildPdf: ReincidenciasReport.build,
                       filename: 'ProductosReincidentes.pdf',
-                      previewColor: EnvColors.azulito,
-                      pdfColor: EnvColors.verdete,
                     ),
+                    const SizedBox(height: 12),
                   ],
                 ),
               ),
@@ -205,6 +218,14 @@ class _ReportListWarrantyMdlState extends State<ReportListWarrantyMdl> {
                 type: ReportFilterType.trimestral,
                 child: Column(
                   children: [
+                    Text(
+                      "Top 5 garantias más antiguas",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey,
+                      ),
+                    ),
                     DropdownButtonFormField<int>(
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
@@ -236,17 +257,14 @@ class _ReportListWarrantyMdlState extends State<ReportListWarrantyMdl> {
                     const SizedBox(height: 12),
                     _buildYearWheel(),
                     const SizedBox(height: 12),
-                    _buildButtons(activeFilter == ReportFilterType.trimestral),
-                    const SizedBox(height: 12),
-                    ReportDescriber(
-                      title: 'Top 5 Garantías Más Antiguas en Proceso',
-                      description:
-                          'Lista de las 5 garantías más antiguas en proceso',
+
+                    _buildButtons(
+                      activeFilter == ReportFilterType.trimestral,
                       buildPdf: ReportTop5Antiguas.build,
                       filename: 'Top5GarantiasAntiguas.pdf',
-                      previewColor: EnvColors.azulito,
-                      pdfColor: EnvColors.verdete,
                     ),
+
+                    const SizedBox(height: 12),
                   ],
                 ),
               ),
@@ -355,31 +373,62 @@ class _ReportListWarrantyMdlState extends State<ReportListWarrantyMdl> {
   }
 
   // 🔹 Botones de acción
-  Widget _buildButtons(bool enabled) {
+  Widget _buildButtons(
+    bool isActive, {
+    required Future<pw.Document> Function() buildPdf,
+    required String filename,
+  }) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Expanded(
-          child: ElevatedButton(
-            onPressed: enabled
-                ? () {
-                    // TODO: lógica de previsualización
-                  }
-                : null,
-            style: ElevatedButton.styleFrom(backgroundColor: EnvColors.azulito),
-            child: const Text("Previsualizar"),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.visibility),
+          label: const Text("Previsualizar"),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: EnvColors.azulito,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
+          onPressed: isActive
+              ? () async {
+                  try {
+                    final pdf = await buildPdf();
+                    await Printing.layoutPdf(
+                      onLayout: (format) async => pdf.save(),
+                    );
+                  } catch (e) {
+                    ErrorSnackbar.show(context, "Error al previsualizar: $e");
+                  }
+                }
+              : null,
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: enabled
-                ? () {
-                    // TODO: lógica de imprimir
-                  }
-                : null,
-            style: ElevatedButton.styleFrom(backgroundColor: EnvColors.verdete),
-            child: const Text("Imprimir"),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.print),
+          label: const Text("PDF"),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: EnvColors.verdete,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
+          onPressed: isActive
+              ? () async {
+                  try {
+                    final pdf = await buildPdf();
+                    await Printing.sharePdf(
+                      bytes: await pdf.save(),
+                      filename: filename,
+                    );
+                  } catch (e) {
+                    ErrorSnackbar.show(context, "Error al imprimir: $e");
+                  }
+                }
+              : null,
         ),
       ],
     );

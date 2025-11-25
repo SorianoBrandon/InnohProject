@@ -2,6 +2,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:innohproject/src/helpers/snackbars.dart';
 import 'package:innohproject/src/models/mdl_product.dart';
 
 class ProductController extends GetxController {
@@ -18,16 +19,40 @@ class ProductController extends GetxController {
 
   final FirebaseFirestore db = FirebaseFirestore.instance;
 
-  Future<int> buscarProducto() async {
+  Future<int> buscarProducto(BuildContext context) async {
+    final codigo = cont_codigo.text.trim();
+
+    // 👉 Validación de longitud mínima
+    if (codigo.length < 4) {
+      ErrorSnackbar.show(context, "El código debe tener al menos 4 dígitos");
+      cont_descripcion.clear();
+      cont_marca.clear();
+      cont_modelo.clear();
+      cont_tipo.clear();
+      cont_tGarantia.clear();
+      txt_button.value = "Guardar"; // reset
+      isSearching.value = true;
+      return 0;
+    }
+
+    // 👉 Búsqueda en Firestore
     final snapshot = await db
         .collection('Productos')
-        .where('Codigo', isEqualTo: cont_codigo.text.trim())
+        .where('Codigo', isEqualTo: codigo)
         .get();
 
     if (snapshot.docs.isEmpty) {
+      ErrorSnackbar.show(context, "No se encontró producto con ese código");
+      cont_descripcion.clear();
+      cont_marca.clear();
+      cont_modelo.clear();
+      cont_tipo.clear();
+      cont_tGarantia.clear();
+      txt_button.value = "Guardar";
+      isSearching.value = true;
       return 0;
     } else {
-      final Producto producto = Producto.fromJson(snapshot.docs.first.data());
+      final producto = Producto.fromJson(snapshot.docs.first.data());
       cont_descripcion.text = producto.descripcion;
       cont_marca.text = producto.marca;
       cont_modelo.text = producto.modelo;

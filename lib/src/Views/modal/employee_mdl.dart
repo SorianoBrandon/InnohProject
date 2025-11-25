@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:innohproject/src/atom/employcontroller.dart';
 import 'package:innohproject/src/env/env_Colors.dart';
@@ -30,11 +31,15 @@ class EmployeeMdl extends StatelessWidget {
 
             TextField(
               controller: controller.cont_dni,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(13),
+              ],
               decoration: const InputDecoration(
                 labelText: 'DNI',
                 border: OutlineInputBorder(),
               ),
-              keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 12),
 
@@ -68,6 +73,10 @@ class EmployeeMdl extends StatelessWidget {
 
             TextField(
               controller: controller.cont_phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(8),
+              ],
               decoration: const InputDecoration(
                 labelText: 'Celular',
                 border: OutlineInputBorder(),

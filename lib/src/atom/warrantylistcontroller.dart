@@ -126,6 +126,46 @@ class WarrantyListController extends GetxController {
     await _cargarPorRango(inicio, fin);
   }
 
+  Future<void> cargarSemanalEnProceso(int semana, int anio) async {
+    // Calcular primer día del año
+    DateTime inicioAnio = DateTime(anio, 1, 1);
+
+    // Día inicial de la semana (ISO simplificado: semana 1 empieza en el primer lunes del año)
+    DateTime inicio = inicioAnio.add(Duration(days: (semana - 1) * 7));
+
+    // Fin de la semana (7 días después)
+    DateTime fin = inicio.add(const Duration(days: 6));
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('Garantias')
+          .where(
+            'FechaEntrada',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(inicio),
+          )
+          .where('FechaEntrada', isLessThanOrEqualTo: Timestamp.fromDate(fin))
+          .where('Estado', isEqualTo: 1) // 👈 solo en proceso
+          .get();
+
+      final garantiasTemp = snapshot.docs
+          .map((doc) {
+            try {
+              return Warranty.fromJson(doc.data());
+            } catch (e) {
+              print("Error al convertir garantía: $e");
+              return null;
+            }
+          })
+          .whereType<Warranty>()
+          .toList();
+
+      listaReportes.value = garantiasTemp; // 👈 llena la lista del reporte
+    } catch (e) {
+      print("Error al cargar garantías semanales en proceso: $e");
+      listaReportes.value = [];
+    }
+  }
+
   Future<void> cargarSemanal(int semana, int anio) async {
     // Calcular primer día del año
     DateTime inicioAnio = DateTime(anio, 1, 1);

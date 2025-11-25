@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:innohproject/src/atom/productcontroller.dart';
 import 'package:innohproject/src/models/mdl_product.dart';
@@ -22,8 +23,9 @@ class ProductMdl extends StatelessWidget {
           children: [
             TextField(
               controller: controller.cont_codigo,
+              inputFormatters: [LengthLimitingTextInputFormatter(6)],
               decoration: const InputDecoration(labelText: "Código"),
-              onSubmitted: (_) => controller.buscarProducto(),
+              onSubmitted: (_) => controller.buscarProducto(context),
             ),
             TextField(
               controller: controller.cont_descripcion,
@@ -43,26 +45,32 @@ class ProductMdl extends StatelessWidget {
             ),
             TextField(
               controller: controller.cont_tGarantia,
-              decoration: const InputDecoration(labelText: "Tiempo de garantía (meses)"),
+              decoration: const InputDecoration(
+                labelText: "Tiempo de garantía (meses)",
+              ),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 20),
-            Obx(() => ElevatedButton(
-                  onPressed: () {
-                    controller.guardarProducto(
-                      Producto(
-                        codigo: controller.cont_codigo.text.trim(),
-                        descripcion: controller.cont_descripcion.text.trim(),
-                        marca: controller.cont_marca.text.trim(),
-                        modelo: controller.cont_modelo.text.trim(),
-                        tipo: controller.cont_tipo.text.trim(),
-                        tGarantia: int.tryParse(controller.cont_tGarantia.text.trim()) ?? 0,
-                      ),
-                    );
-                    Navigator.pop(context);
-                  },
-                  child: Text(controller.txt_button.value),
-                )),
+            Obx(
+              () => ElevatedButton(
+                onPressed: () {
+                  controller.guardarProducto(
+                    Producto(
+                      codigo: controller.cont_codigo.text.trim(),
+                      descripcion: controller.cont_descripcion.text.trim(),
+                      marca: controller.cont_marca.text.trim(),
+                      modelo: controller.cont_modelo.text.trim(),
+                      tipo: controller.cont_tipo.text.trim(),
+                      tGarantia:
+                          int.tryParse(controller.cont_tGarantia.text.trim()) ??
+                          0,
+                    ),
+                  );
+                  Navigator.pop(context);
+                },
+                child: Text(controller.txt_button.value),
+              ),
+            ),
           ],
         ),
       ),
