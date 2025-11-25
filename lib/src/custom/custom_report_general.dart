@@ -5,37 +5,20 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:intl/intl.dart';
 import 'package:innohproject/src/env/env_Colors.dart';
 
-class CustomReportReincidencias {
-  /// Construye un PDF con el listado de garantías con reincidencias
+class CustomReportGeneral {
   static Future<pw.Document> build({
     required String titulo,
+    required String periodo,
     required List<Map<String, dynamic>> data,
   }) async {
     final pdf = pw.Document();
     final now = DateTime.now();
-
-    // Fecha de corte: último día del mes actual
-    final ultimoDiaMes = DateTime(now.year, now.month + 1, 0);
-    final fechaCorte = DateFormat('dd/MM/yyyy').format(ultimoDiaMes);
 
     final fechaEmision = DateFormat('dd/MM/yyyy - hh:mm a').format(now);
 
     // Logo corporativo
     final logoBytes = await rootBundle.load('assets/Logo.jpg');
     final logoImage = pw.MemoryImage(Uint8List.view(logoBytes.buffer));
-
-    // 🔹 Filtrar solo las garantías con reincidencias > 1
-    final reincidenciasData = data.where((e) {
-      final num = int.tryParse(e['reincidencias'].toString()) ?? 0;
-      return num > 1;
-    }).toList();
-
-    // 🔹 Ordenar de mayor a menor reincidencia
-    reincidenciasData.sort((a, b) {
-      final numA = int.tryParse(a['reincidencias'].toString()) ?? 0;
-      final numB = int.tryParse(b['reincidencias'].toString()) ?? 0;
-      return numB.compareTo(numA);
-    });
 
     pdf.addPage(
       pw.MultiPage(
@@ -75,7 +58,7 @@ class CustomReportReincidencias {
           ),
           pw.SizedBox(height: 16),
 
-          // Recuadro con fecha de corte y total
+          // Recuadro con periodo y total
           pw.Container(
             padding: const pw.EdgeInsets.all(12),
             decoration: pw.BoxDecoration(
@@ -86,11 +69,11 @@ class CustomReportReincidencias {
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
                 pw.Text(
-                  'Fecha de corte: $fechaCorte',
+                  'Periodo de tiempo: $periodo',
                   style: const pw.TextStyle(fontSize: 12),
                 ),
                 pw.Text(
-                  'Total de reincidencias: ${reincidenciasData.length}',
+                  'Total de garantías: ${data.length}',
                   style: const pw.TextStyle(fontSize: 12),
                 ),
               ],
@@ -98,16 +81,25 @@ class CustomReportReincidencias {
           ),
           pw.SizedBox(height: 24),
 
-          // Tabla con encabezado en verdete
+          // Tabla con encabezado en verdete (incluye Incidencias)
           pw.TableHelper.fromTextArray(
-            headers: ['Reincidencias', 'Id', 'Producto', 'Marca'],
-            data: reincidenciasData
+            headers: [
+              'Id',
+              'Producto',
+              'Cliente',
+              'Fecha Entrada',
+              'Fecha Vencimiento',
+              'Incidentes',
+            ],
+            data: data
                 .map(
                   (e) => [
-                    e['reincidencias'].toString(),
                     e['id'],
                     e['producto'],
-                    e['marca'], // 👈 usa el campo marca del modelo Warranty
+                    e['cliente'],
+                    e['fechaEntrada'],
+                    e['fechaVencimiento'],
+                    e['numIncidencias'] ?? 0,
                   ],
                 )
                 .toList(),
@@ -127,12 +119,14 @@ class CustomReportReincidencias {
               1: pw.Alignment.center,
               2: pw.Alignment.center,
               3: pw.Alignment.center,
+              4: pw.Alignment.center,
+              5: pw.Alignment.center,
             },
           ),
 
           pw.SizedBox(height: 24),
 
-          // Pie de página institucional
+          // Pie de página institucional (sin total de incidencias)
           pw.Container(
             alignment: pw.Alignment.centerLeft,
             child: pw.Column(

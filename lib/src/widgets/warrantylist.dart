@@ -54,7 +54,7 @@ class WarrantyList extends StatelessWidget {
                     ),
                     subtitle: esGerente
                         ? Text(
-                            "Cliente: ${g.nombreCl}\nTel: ${g.telefonoCl}\nDNI: ${g.dni}",
+                            "Cliente: ${g.nombreCl}\nTel: ${g.telefonoCl}\nDNI: ${g.dni}\nVencimiento: ${g.fechaVencimiento.toLocal().toString().split(' ')[0]}",
                           )
                         : Text(
                             "Inicio: ${g.fechaEntrada.toLocal().toString().split(' ')[0]}\n"

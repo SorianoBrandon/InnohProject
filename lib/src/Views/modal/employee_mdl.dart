@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:innohproject/src/atom/employcontroller.dart';
 import 'package:innohproject/src/env/env_Colors.dart';
+import 'package:innohproject/src/helpers/snackbars.dart';
 import 'package:innohproject/src/models/mdl_employ.dart';
 
 class EmployeeMdl extends StatelessWidget {
@@ -107,6 +108,10 @@ class EmployeeMdl extends StatelessWidget {
                     role: controller.cont_role.text.trim(),
                   );
                   controller.guardarEmpleado(empleado, context);
+                  SuccessSnackbar.show(
+                    context,
+                    "Empleado Guardado Correctamente",
+                  );
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(

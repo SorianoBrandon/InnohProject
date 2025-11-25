@@ -162,6 +162,10 @@ class ClientMdl extends StatelessWidget {
                             phone: controller.cont_phone.text.trim(),
                           );
                           controller.guardarCliente(client);
+                          SuccessSnackbar.show(
+                            context,
+                            "Cliente guardado correctamente.",
+                          );
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
