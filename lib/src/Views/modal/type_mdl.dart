@@ -41,6 +41,13 @@ class TypeMdl extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
+                  if (controller.cont_type.text.trim().isEmpty) {
+                    ErrorSnackbar.show(
+                      context,
+                      "Debe ingresar un tipo de producto.",
+                    );
+                    return; // Detiene la ejecución si está vacío
+                  }
                   final MdlType type = MdlType(
                     type: controller.cont_type.text.trim(),
                   );

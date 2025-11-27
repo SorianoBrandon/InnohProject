@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:innohproject/src/atom/warrantylistcontroller.dart';
@@ -7,6 +8,7 @@ import 'package:innohproject/src/custom/report%20generators/reincidencias_report
 import 'package:innohproject/src/custom/report%20generators/top5_report.dart';
 import 'package:innohproject/src/helpers/snackbars.dart';
 import 'package:innohproject/src/env/env_Colors.dart';
+import 'package:innohproject/src/models/mdl_warranty.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -98,13 +100,26 @@ class _ReportListWarrantyMdlState extends State<ReportListWarrantyMdl> {
                             context,
                             'Debes seleccionar semana y año antes de generar el reporte',
                           );
-                          return null; // 👈 evita que intente generar el PDF
+                          return null;
                         }
+
+                        final inicio = _isoWeekStart(
+                          anioSeleccionado,
+                          semanaSeleccionada!,
+                        );
+                        final fin = _isoWeekEnd(
+                          anioSeleccionado,
+                          semanaSeleccionada!,
+                        );
+                        final periodoTexto =
+                            '${DateFormat('dd/MM/yyyy').format(inicio)} - ${DateFormat('dd/MM/yyyy').format(fin)}';
 
                         final controller = Get.find<WarrantyListController>();
                         await _aplicarFiltros(controller);
 
-                        return await ProcesosReport.build();
+                        return await ProcesosReport.build(
+                          periodo: periodoTexto,
+                        );
                       },
                       filename: 'ProductosProcesosGarantias.pdf',
                     ),
@@ -425,47 +440,6 @@ class _ReportListWarrantyMdlState extends State<ReportListWarrantyMdl> {
     );
   }
 
-  Future<void> _aplicarFiltros(WarrantyListController controller) async {
-    switch (activeFilter) {
-      case ReportFilterType.semanal:
-        if (semanaSeleccionada != null) {
-          await controller.cargarSemanalEnProceso(
-            semanaSeleccionada!,
-            anioSeleccionado,
-          );
-        }
-        break;
-
-      case ReportFilterType.quincenal:
-        if (quincenaSeleccionada != null && mesSeleccionado != null) {
-          await controller.cargarQuincenal(
-            quincenaSeleccionada!,
-            mesSeleccionado!,
-            anioSeleccionado,
-          );
-        }
-        break;
-
-      case ReportFilterType.mensual:
-        if (mesSeleccionado != null) {
-          await controller.cargarMensual(mesSeleccionado!, anioSeleccionado);
-        }
-        break;
-
-      case ReportFilterType.trimestral:
-        if (trimestreSeleccionado != null) {
-          await controller.cargarTrimestral(
-            trimestreSeleccionado!,
-            anioSeleccionado,
-          );
-        }
-        break;
-
-      case ReportFilterType.none:
-        break;
-    }
-  }
-
   DateTime _isoWeekStart(int year, int week) {
     // ISO: semana 1 es la que contiene el primer jueves del año
     final jan4 = DateTime(year, 1, 4);
@@ -519,6 +493,83 @@ class _ReportListWarrantyMdlState extends State<ReportListWarrantyMdl> {
         });
       },
     );
+  }
+
+  Future<void> cargarSemanalISOEnProceso(int semana, int anio) async {
+    // Usar los helpers ISO
+    final inicio = _isoWeekStart(anio, semana);
+    final fin = _isoWeekEnd(anio, semana);
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('Garantias')
+          .where(
+            'FechaEntrada',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(inicio),
+          )
+          .where('FechaEntrada', isLessThanOrEqualTo: Timestamp.fromDate(fin))
+          .where('Estado', isEqualTo: 1) // solo en proceso
+          .get();
+
+      final garantiasTemp = snapshot.docs
+          .map((doc) {
+            try {
+              return Warranty.fromJson(doc.data());
+            } catch (e) {
+              print("Error al convertir garantía: $e");
+              return null;
+            }
+          })
+          .whereType<Warranty>()
+          .toList();
+
+      WarrantyListController.listaReportes.value = garantiasTemp;
+    } catch (e) {
+      print("Error al cargar garantías semanales ISO en proceso: $e");
+      WarrantyListController.listaReportes.value = [];
+    }
+  }
+
+  Future<void> _aplicarFiltros(WarrantyListController controller) async {
+    switch (activeFilter) {
+      case ReportFilterType.semanal:
+        if (semanaSeleccionada != null) {
+          // usar el helper local que calcula el rango ISO y carga las garantías
+          await cargarSemanalISOEnProceso(
+            semanaSeleccionada!,
+            anioSeleccionado,
+          );
+        }
+        break;
+
+      case ReportFilterType.quincenal:
+        if (quincenaSeleccionada != null && mesSeleccionado != null) {
+          await controller.cargarQuincenal(
+            quincenaSeleccionada!,
+            mesSeleccionado!,
+            anioSeleccionado,
+          );
+        }
+        break;
+
+      case ReportFilterType.mensual:
+        if (mesSeleccionado != null) {
+          await controller.cargarMensual(mesSeleccionado!, anioSeleccionado);
+        }
+        break;
+
+      case ReportFilterType.trimestral:
+        if (trimestreSeleccionado != null) {
+          await controller.cargarTrimestral(
+            trimestreSeleccionado!,
+            anioSeleccionado,
+          );
+        }
+        break;
+
+      case ReportFilterType.none:
+        break;
+    }
   }
 
   // 🔹 Botones de acción

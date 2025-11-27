@@ -42,11 +42,18 @@ class BrandMdl extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
+                  // Validar que el campo no esté vacío
+                  if (controller.cont_brand.text.trim().isEmpty) {
+                    ErrorSnackbar.show(context, "Por favor ingrese una marca.");
+                    return; // No continúa si está vacío
+                  }
+
                   final MdlBrand brand = MdlBrand(
                     brand: controller.cont_brand.text.trim(),
                     date: Timestamp.now(),
                     flag: 1,
                   );
+
                   int estado = await controller.guardarMarca(brand);
                   if (estado == 1) {
                     ErrorSnackbar.show(context, "La Marca ya Existe.");

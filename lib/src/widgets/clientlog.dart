@@ -34,7 +34,7 @@ class ClientLog extends StatelessWidget {
             ],
             controller: clientCont.cont_DNI,
             decoration: InputDecoration(
-              labelText: 'Numero de Identidad',
+              labelText: 'Número de Identidad',
               border: UnderlineInputBorder(),
             ),
           ),

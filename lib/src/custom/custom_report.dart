@@ -10,23 +10,15 @@ class CustomReport {
   static Future<pw.Document> build({
     required String titulo,
     required List<Map<String, dynamic>> data,
+    required String periodo, // 👈 nuevo parámetro
   }) async {
     final pdf = pw.Document();
     final now = DateTime.now();
-
-    // Fecha de corte: último día del mes actual
-    final ultimoDiaMes = DateTime(now.year, now.month + 1, 0);
-    final fechaCorte = DateFormat('dd/MM/yyyy').format(ultimoDiaMes);
-
     final fechaEmision = DateFormat('dd/MM/yyyy - hh:mm a').format(now);
 
     // Logo corporativo
     final logoBytes = await rootBundle.load('assets/Logo.jpg');
     final logoImage = pw.MemoryImage(Uint8List.view(logoBytes.buffer));
-
-    // Contadores por estado (solo 0 y 1)
-    final base = data.where((e) => e['estado'] == 'Sin reclamo').length;
-    final enProceso = data.where((e) => e['estado'] == 'En proceso').length;
 
     pdf.addPage(
       pw.MultiPage(
@@ -66,7 +58,7 @@ class CustomReport {
           ),
           pw.SizedBox(height: 16),
 
-          // Recuadro con fecha de corte y total
+          // Recuadro con periodo dinámico y total
           pw.Container(
             padding: const pw.EdgeInsets.all(12),
             decoration: pw.BoxDecoration(
@@ -77,11 +69,11 @@ class CustomReport {
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               children: [
                 pw.Text(
-                  'Fecha de corte: $fechaCorte',
+                  'Periodo: $periodo', // 👈 dinámico
                   style: const pw.TextStyle(fontSize: 12),
                 ),
                 pw.Text(
-                  'Total de garantías: ${data.length}',
+                  'Total de garantías en proceso: ${data.length}',
                   style: const pw.TextStyle(fontSize: 12),
                 ),
               ],
@@ -89,13 +81,13 @@ class CustomReport {
           ),
           pw.SizedBox(height: 24),
 
-          // Tabla con encabezado en verdete
+          // Tabla
           pw.TableHelper.fromTextArray(
             headers: [
               'Id',
               'Producto',
               'Cliente',
-              'Proveedor',
+              'Marca',
               'Estado',
               'Fecha cierre',
               'Días restantes',
@@ -106,7 +98,7 @@ class CustomReport {
                     e['id'],
                     e['producto'],
                     e['cliente'],
-                    e['proveedor'],
+                    e['marca'],
                     e['estado'],
                     e['fechaCierre'],
                     e['diasRestantes'].toString(),
@@ -137,20 +129,12 @@ class CustomReport {
 
           pw.SizedBox(height: 24),
 
-          // Pie de página con desglose
+          // Pie de página
           pw.Container(
             alignment: pw.Alignment.centerLeft,
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text(
-                  'Sin reclamo: $base',
-                  style: const pw.TextStyle(fontSize: 10),
-                ),
-                pw.Text(
-                  'En proceso: $enProceso',
-                  style: const pw.TextStyle(fontSize: 10),
-                ),
                 pw.SizedBox(height: 6),
                 pw.Text(
                   'Fecha de emisión: $fechaEmision',

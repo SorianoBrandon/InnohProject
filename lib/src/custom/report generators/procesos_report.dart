@@ -1,12 +1,13 @@
 import 'package:innohproject/src/atom/warrantylistcontroller.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
-
 import 'package:innohproject/src/custom/custom_report.dart';
 
 /// Generador del reporte de garantías en proceso (Estado == 1)
 class ProcesosReport {
-  static Future<pw.Document> build() async {
+  static Future<pw.Document> build({
+    required String periodo, // 👈 periodo dinámico
+  }) async {
     // 🔹 Usar la lista ya filtrada
     final garantias = WarrantyListController.listaReportes;
 
@@ -34,7 +35,7 @@ class ProcesosReport {
           'id': "${g.dni}${g.ns}",
           'producto': nombreProducto,
           'cliente': nombreCliente.isEmpty ? 'Sin nombre' : nombreCliente,
-          'proveedor': proveedor,
+          'marca': proveedor,
           'estado': estadoTexto,
           'fechaCierre': fechaCierre,
           'diasRestantes': diasRestantes,
@@ -46,6 +47,7 @@ class ProcesosReport {
     return await CustomReport.build(
       titulo: "Listado de Garantías en Proceso",
       data: datos,
+      periodo: periodo, // 👈 se pasa aquí
     );
   }
 }

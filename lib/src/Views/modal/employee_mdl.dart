@@ -84,29 +84,34 @@ class EmployeeMdl extends StatelessWidget {
               ),
               keyboardType: TextInputType.phone,
             ),
-            const SizedBox(height: 12),
-
-            TextField(
-              controller: controller.cont_role,
-              decoration: const InputDecoration(
-                labelText: 'Rol',
-                border: OutlineInputBorder(),
-              ),
-            ),
 
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
+                  // Validar que los campos estén llenos
+                  if (controller.cont_dni.text.trim().isEmpty ||
+                      controller.cont_name.text.trim().isEmpty ||
+                      controller.cont_user.text.trim().isEmpty ||
+                      controller.cont_password.text.trim().isEmpty ||
+                      controller.cont_phone.text.trim().isEmpty) {
+                    ErrorSnackbar.show(
+                      context,
+                      "Debe completar todos los campos antes de guardar.",
+                    );
+                    return;
+                  }
+
                   final empleado = MdlEmploy(
                     dni: controller.cont_dni.text.trim(),
                     name: controller.cont_name.text.trim(),
                     user: controller.cont_user.text.trim(),
                     password: controller.cont_password.text.trim(),
                     phone: controller.cont_phone.text.trim(),
-                    role: controller.cont_role.text.trim(),
+                    role: "Vendedor", // siempre será vendedor
                   );
+
                   controller.guardarEmpleado(empleado, context);
                   SuccessSnackbar.show(
                     context,

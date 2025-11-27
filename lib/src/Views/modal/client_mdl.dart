@@ -154,6 +154,17 @@ class ClientMdl extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: controller.isSearching.value
                       ? () async {
+                          if (controller.cont_dni.text.trim().isEmpty ||
+                              controller.cont_name.text.trim().isEmpty ||
+                              controller.cont_lname.text.trim().isEmpty ||
+                              controller.cont_address.text.trim().isEmpty ||
+                              controller.cont_phone.text.trim().isEmpty) {
+                            ErrorSnackbar.show(
+                              context,
+                              "Debe completar todos los campos antes de guardar.",
+                            );
+                            return; // Detiene la ejecución si falta algún dato
+                          }
                           final MdlClient client = MdlClient(
                             dni: controller.cont_dni.text.trim(),
                             name: controller.cont_name.text.trim(),

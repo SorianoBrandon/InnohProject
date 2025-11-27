@@ -164,6 +164,16 @@ class _ProductMdlState extends State<ProductMdl> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
+                    if (controller.cont_codigo.text.trim().isEmpty ||
+                        controller.cont_descripcion.text.trim().isEmpty ||
+                        controller.cont_modelo.text.trim().isEmpty ||
+                        controller.cont_tGarantia.text.trim().isEmpty) {
+                      ErrorSnackbar.show(
+                        context,
+                        "Debe completar todos los campos de texto.",
+                      );
+                      return;
+                    }
                     if (marcaSeleccionada == null || tipoSeleccionado == null) {
                       WarningSnackbar.show(
                         context,
